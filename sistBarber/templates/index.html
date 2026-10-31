@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+
+{% block title %}Início | {{ barbershop_name }}{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="relative overflow-hidden pt-12 pb-24 md:pt-20 md:pb-32">
+    <!-- Luz ambiente dourada de fundo -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gold-400/10 rounded-full blur-[130px] pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <!-- Texto Hero -->
+            <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-dark-800 border border-gold-400/30 text-gold-400 text-xs font-semibold uppercase tracking-widest">
+                    <i class="fas fa-crown text-[10px]"></i>
+                    <span>Tradição & Exclusividade Masculina</span>
+                </div>
+
+                <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                    A arte de transformar seu visual com <span class="gold-gradient-text">precisão milimétrica</span>.
+                </h1>
+
+                <p class="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto lg:mx-0 font-light leading-relaxed">
+                    Mais do que um simples corte, uma experiência sensorial completa: toalha quente, navalha afiada, cerveja artesanal e um ambiente de puro relaxamento.
+                </p>
+
+                <!-- CTAs -->
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                    <a href="{{ url_for('agendar') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-wider bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 text-dark-950 shadow-xl shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        <i class="fas fa-calendar-check text-base"></i>
+                        <span>Reservar Meu Horário</span>
+                    </a>
+                    <a href="#servicos" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold text-sm text-gray-300 bg-dark-850 hover:bg-dark-800 border border-dark-700 hover:border-gold-400/40 hover:text-white transition-all">
+                        <span>Ver Tabela de Preços</span>
+                        <i class="fas fa-arrow-down text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- Estatísticas Rápidas -->
+                <div class="pt-8 border-t border-dark-800 grid grid-cols-3 gap-6 text-center lg:text-left">
+                    <div>
+                        <div class="font-serif text-2xl sm:text-3xl font-extrabold text-gold-400">10+</div>
+                        <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">Anos no Mercado</div>
+                    </div>
+                    <div>
+                        <div class="font-serif text-2xl sm:text-3xl font-extrabold text-gold-400">12.5k</div>
+                        <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">Clientes Atendidos</div>
+                    </div>
+                    <div>
+                        <div class="font-serif text-2xl sm:text-3xl font-extrabold text-gold-400">4.9 ★</div>
+                        <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">Avaliação Média</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Imagem Destaque / Visual Card -->
+            <div class="lg:col-span-5 relative">
+                <div class="relative mx-auto max-w-md lg:max-w-none">
+                    
+                    <!-- Moldura Decorativa -->
+                    <div class="absolute -inset-1.5 bg-gradient-to-r from-gold-400/40 via-dark-700 to-gold-600/30 rounded-3xl blur-lg opacity-70"></div>
+                    
+                    <div class="relative bg-dark-900 border border-dark-700/80 rounded-2xl overflow-hidden p-3 shadow-2xl">
+                        <!-- Imagem Temática de Alta Qualidade -->
+                        <div class="relative h-96 rounded-xl overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=800&q=80" 
+                                 alt="Barbearia Moderna" 
+                                 class="w-full h-full object-cover object-center filter brightness-90 hover:scale-105 transition-transform duration-700">
+                            
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-transparent"></div>
+                            
+                            <!-- Card Flutuante com Agendamento Próximo -->
+                            <div class="absolute bottom-4 left-4 right-4 bg-dark-900/90 backdrop-blur-md border border-dark-700 rounded-xl p-3.5 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                                        <i class="fas fa-check-double"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs text-gray-400">Atendimento Pontual</div>
+                                        <div class="text-sm font-semibold text-white">Sem filas de espera</div>
+                                    </div>
+                                </div>
+                                <span class="px-2.5 py-1 text-[11px] font-bold uppercase rounded-md bg-gold-400/10 text-gold-400 border border-gold-400/20">
+                                    Horário Marcado
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SEÇÃO DE DIFERENCIAIS -->
+<section class="py-16 bg-dark-900/60 border-y border-dark-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl bg-dark-800 border border-gold-400/20 flex-shrink-0 flex items-center justify-center text-gold-400 text-xl">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div>
+                    <h3 class="font-serif text-white font-bold text-base mb-1">Mestres Barbeiros</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Profissionais com certificação internacional em visagismo e barboterapia.</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl bg-dark-800 border border-gold-400/20 flex-shrink-0 flex items-center justify-center text-gold-400 text-xl">
+                    <i class="fas fa-beer"></i>
+                </div>
+                <div>
+                    <h3 class="font-serif text-white font-bold text-base mb-1">Open Bar Exclusivo</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Cerveja artesanal trincando ou café expresso premium por conta da casa.</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl bg-dark-800 border border-gold-400/20 flex-shrink-0 flex items-center justify-center text-gold-400 text-xl">
+                    <i class="fas fa-hot-tub"></i>
+                </div>
+                <div>
+                    <h3 class="font-serif text-white font-bold text-base mb-1">Toalha Quente & Ozônio</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Tratamento térmico facial para abertura de poros e relaxamento muscular total.</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl bg-dark-800 border border-gold-400/20 flex-shrink-0 flex items-center justify-center text-gold-400 text-xl">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div>
+                    <h3 class="font-serif text-white font-bold text-base mb-1">Lembretes WhatsApp</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Você recebe lembretes automáticos com antecedência para nunca perder o horário.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SEÇÃO DE SERVIÇOS & PACOTES (CARREGADOS DINAMICAMENTE DO BANCO) -->
+<section id="servicos" class="py-24 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header da Seção -->
+        <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <span class="text-xs uppercase font-bold tracking-[0.2em] text-gold-400 block">Tabela Oficial de Serviços</span>
+            <h2 class="font-serif text-3xl sm:text-4xl font-extrabold text-white">
+                Escolha o Pacote Ideal para o Seu Estilo
+            </h2>
+            <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
+                Preços transparentes, produtos de excelência e atendimento de alto nível. Os valores abaixo são atualizados em tempo real pelo mestre barbeiro.
+            </p>
+        </div>
+
+        <!-- Grid de Cards de Pacotes -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for package in packages %}
+            <div class="relative flex flex-col justify-between bg-dark-900/90 border border-dark-800 rounded-2xl p-7 hover:border-gold-400/40 transition-all duration-300 hover:shadow-xl hover:shadow-gold-500/10 group">
+                
+                <!-- Badge se for o combo mais vendido -->
+                {% if "Combo" in package.name %}
+                <div class="absolute -top-3 right-6 bg-gradient-to-r from-gold-400 to-gold-600 text-dark-950 font-extrabold text-[10px] tracking-wider uppercase px-3 py-1 rounded-full shadow-md">
+                    ★ Mais Escolhido
+                </div>
+                {% endif %}
+
+                <div>
+                    <!-- Header do Card -->
+                    <div class="flex items-start justify-between gap-4 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-dark-800 border border-dark-700 flex items-center justify-center text-gold-400 group-hover:border-gold-400/50 transition-colors">
+                            {% if "Barba" in package.name and "Corte" not in package.name %}
+                                <i class="fas fa-spray-can text-lg"></i>
+                            {% elif "Combo" in package.name %}
+                                <i class="fas fa-crown text-lg"></i>
+                            {% elif "Platinado" in package.name or "Grisalhos" in package.name %}
+                                <i class="fas fa-magic text-lg"></i>
+                            {% else %}
+                                <i class="fas fa-cut text-lg"></i>
+                            {% endif %}
+                        </div>
+
+                        <!-- Duração -->
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-dark-800 text-gray-300 text-xs font-medium">
+                            <i class="far fa-clock text-gold-400"></i>
+                            {{ package.duration_formatted }}
+                        </span>
+                    </div>
+
+                    <!-- Nome & Descrição -->
+                    <h3 class="font-serif text-xl font-bold text-white group-hover:text-gold-400 transition-colors mb-2">
+                        {{ package.name }}
+                    </h3>
+                    <p class="text-xs sm:text-sm text-gray-400 leading-relaxed mb-6">
+                        {{ package.description or "Experiência completa com profissionais qualificados e finalização com cosméticos de alta performance." }}
+                    </p>
+                </div>
+
+                <!-- Footer do Card com Preço e Ação -->
+                <div class="pt-6 border-t border-dark-800/80 flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Valor</div>
+                        <div class="font-serif text-2xl font-extrabold text-white">
+                            {{ package.price_formatted }}
+                        </div>
+                    </div>
+
+                    <a href="{{ url_for('agendar', pacote=package.id) }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-dark-800 hover:bg-gold-400 text-gold-400 hover:text-dark-950 border border-gold-400/30 hover:border-gold-400 transition-all duration-200 shadow-sm">
+                        <span>Agendar</span>
+                        <i class="fas fa-chevron-right text-[10px]"></i>
+                    </a>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Banner Promocional / Agendamento Rápido -->
+        <div class="mt-16 bg-gradient-to-r from-dark-900 via-dark-850 to-dark-900 border border-gold-400/20 rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden">
+            <div class="relative z-10 max-w-2xl mx-auto space-y-4">
+                <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white">
+                    Não sabe qual pacote escolher?
+                </h3>
+                <p class="text-sm text-gray-400">
+                    Você também pode iniciar o agendamento e conversar com o nosso visagista no momento da sua chegada para personalizar seu corte.
+                </p>
+                <div class="pt-2">
+                    <a href="{{ url_for('agendar') }}" class="inline-flex items-center gap-3 px-8 py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase bg-gold-400 hover:bg-gold-500 text-dark-950 transition shadow-lg shadow-gold-500/20">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Ir para o Agendamento Online</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- GALERIA DE ESTILOS -->
+<section id="galeria" class="py-20 bg-dark-900/40 border-t border-dark-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-14 space-y-3">
+            <span class="text-xs uppercase font-bold tracking-[0.2em] text-gold-400 block">Nosso Portfólio</span>
+            <h2 class="font-serif text-3xl font-extrabold text-white">Estilos em Destaque</h2>
+            <p class="text-gray-400 text-sm">Confira alguns dos trabalhos realizados diariamente na nossa cadeira.</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            
+            <div class="relative group rounded-2xl overflow-hidden aspect-square border border-dark-800">
+                <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=600&q=80" 
+                     alt="Degradê Fade" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <span class="font-serif text-sm font-bold text-white">Low Fade & Textura</span>
+                    <span class="text-[11px] text-gold-400">Corte Executivo</span>
+                </div>
+            </div>
+
+            <div class="relative group rounded-2xl overflow-hidden aspect-square border border-dark-800">
+                <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80" 
+                     alt="Barboterapia Clássica" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <span class="font-serif text-sm font-bold text-white">Barba Terapia com Toalha</span>
+                    <span class="text-[11px] text-gold-400">Alinhamento Perfeito</span>
+                </div>
+            </div>
+
+            <div class="relative group rounded-2xl overflow-hidden aspect-square border border-dark-800">
+                <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=600&q=80" 
+                     alt="Corte Clássico Pompadour" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <span class="font-serif text-sm font-bold text-white">Pompadour Clássico</span>
+                    <span class="text-[11px] text-gold-400">Pomada Acabamento Brilho</span>
+                </div>
+            </div>
+
+            <div class="relative group rounded-2xl overflow-hidden aspect-square border border-dark-800">
+                <img src="https://images.unsplash.com/photo-1517832606589-7629c339590a?auto=format&fit=crop&w=600&q=80" 
+                     alt="Camuflagem e Alinhamento" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <span class="font-serif text-sm font-bold text-white">Navalhado Razor Fade</span>
+                    <span class="text-[11px] text-gold-400">Design Moderno</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SEÇÃO SOBRE & LOCALIZAÇÃO -->
+<section id="sobre" class="py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            <div class="space-y-6">
+                <span class="text-xs uppercase font-bold tracking-[0.2em] text-gold-400 block">Nossa História</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-extrabold text-white leading-tight">
+                    Um refúgio para cavalheiros exigentes que prezam pelo bom gosto.
+                </h2>
+                <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
+                    Fundada com a premissa de resgatar o ritual clássico das antigas barbearias de Londres e Nova York, combinamos técnicas milenares com as tendências contemporâneas de cortes masculinos.
+                </p>
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center gap-3 text-sm text-gray-300">
+                        <i class="fas fa-check text-gold-400"></i>
+                        <span>Agendamento 100% online e sem complicação</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm text-gray-300">
+                        <i class="fas fa-check text-gold-400"></i>
+                        <span>Pontualidade britânica: seu tempo é respeitado</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm text-gray-300">
+                        <i class="fas fa-check text-gold-400"></i>
+                        <span>Produtos importados dermatologicamente testados</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Localização & Horário -->
+            <div id="contato" class="bg-dark-900 border border-dark-800 rounded-3xl p-8 space-y-6">
+                <h3 class="font-serif text-xl font-bold text-white flex items-center gap-3">
+                    <i class="fas fa-map-marked-alt text-gold-400"></i>
+                    <span>Informações & Contato</span>
+                </h3>
+
+                <div class="space-y-4 text-sm text-gray-300">
+                    <div class="flex items-start gap-3.5 pb-4 border-b border-dark-800">
+                        <div class="w-8 h-8 rounded-lg bg-dark-800 flex items-center justify-center text-gold-400 flex-shrink-0">
+                            <i class="fas fa-location-dot"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white">Endereço</div>
+                            <div class="text-gray-400">{{ barbershop_address }}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3.5 pb-4 border-b border-dark-800">
+                        <div class="w-8 h-8 rounded-lg bg-dark-800 flex items-center justify-center text-gold-400 flex-shrink-0">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white">Telefone / WhatsApp</div>
+                            <div class="text-gray-400">{{ barbershop_phone }}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3.5">
+                        <div class="w-8 h-8 rounded-lg bg-dark-800 flex items-center justify-center text-gold-400 flex-shrink-0">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white">Horário de Funcionamento</div>
+                            <div class="text-gray-400">{{ barbershop_hours }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{{ url_for('agendar') }}" class="block text-center w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-gradient-to-r from-gold-400 to-gold-600 text-dark-950 hover:brightness-110 transition shadow-lg shadow-gold-500/20">
+                    Marcar Atendimento Agora
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+

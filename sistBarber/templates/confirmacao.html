@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Agendamento Confirmado! | {{ barbershop_name }}{% endblock %}
+
+{% block content %}
+<section class="py-16 md:py-24 relative overflow-hidden">
+    
+    <!-- Efeito luminoso verde e dourado -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[350px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        
+        <!-- Ícone de Sucesso Animado -->
+        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-tr from-emerald-500 to-emerald-400 text-dark-950 flex items-center justify-center text-3xl shadow-xl shadow-emerald-500/30">
+            <i class="fas fa-check"></i>
+        </div>
+
+        <span class="text-xs uppercase font-bold tracking-[0.25em] text-emerald-400">Reserva Concluída com Sucesso</span>
+        <h1 class="font-serif text-3xl sm:text-4xl font-extrabold text-white mt-2 mb-3">
+            Seu Horário Está Garantido!
+        </h1>
+        <p class="text-sm text-gray-400 max-w-md mx-auto mb-8">
+            Enviamos os detalhes para o seu contato. Apresente este voucher ou informe seu nome no momento da sua chegada.
+        </p>
+
+        <!-- CARTÃO TIPO TICKET DE AGENDAMENTO -->
+        <div class="bg-dark-900 border border-dark-750 rounded-3xl p-6 sm:p-8 text-left shadow-2xl relative overflow-hidden mb-8">
+            
+            <!-- Barra Decorativa Superior Dourada -->
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gold-400 via-emerald-400 to-gold-600"></div>
+
+            <div class="flex items-center justify-between pb-6 border-b border-dark-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gold-400/10 border border-gold-400/30 flex items-center justify-center text-gold-400">
+                        <i class="fas fa-scissors"></i>
+                    </div>
+                    <div>
+                        <div class="font-serif font-bold text-white text-base">{{ barbershop_name }}</div>
+                        <div class="text-[11px] text-gray-400">{{ barbershop_address }}</div>
+                    </div>
+                </div>
+
+                <div class="text-right">
+                    <span class="text-[10px] uppercase tracking-wider text-gray-500 font-bold block">Protocolo</span>
+                    <span class="font-mono text-sm font-bold text-gold-400">#{{ "%05d"|format(appointment.id) }}</span>
+                </div>
+            </div>
+
+            <!-- Dados do Agendamento -->
+            <div class="py-6 space-y-4">
+                
+                <div class="flex justify-between items-center py-1">
+                    <span class="text-xs text-gray-400">Cliente</span>
+                    <span class="text-sm font-bold text-white">{{ appointment.client_name }}</span>
+                </div>
+
+                <div class="flex justify-between items-center py-1">
+                    <span class="text-xs text-gray-400">WhatsApp de Contato</span>
+                    <span class="text-sm font-semibold text-gray-200">{{ appointment.client_phone }}</span>
+                </div>
+
+                <div class="flex justify-between items-center py-1">
+                    <span class="text-xs text-gray-400">Serviço Escolhido</span>
+                    <span class="text-sm font-bold text-gold-400">{{ appointment.package.name }}</span>
+                </div>
+
+                <div class="flex justify-between items-center py-1">
+                    <span class="text-xs text-gray-400">Duração Estimada</span>
+                    <span class="text-xs font-medium text-gray-300">
+                        <i class="far fa-clock text-gold-400 mr-1"></i>{{ appointment.package.duration_formatted }}
+                    </span>
+                </div>
+
+                <div class="flex justify-between items-center py-1">
+                    <span class="text-xs text-gray-400">Data & Horário Marcado</span>
+                    <span class="text-sm font-extrabold text-white bg-dark-800 px-3 py-1 rounded-lg border border-dark-700">
+                        <i class="far fa-calendar-alt text-emerald-400 mr-1.5"></i>{{ appointment.full_datetime_formatted }}
+                    </span>
+                </div>
+
+                {% if appointment.notes %}
+                <div class="pt-2 border-t border-dark-800/80">
+                    <span class="text-xs text-gray-500 block mb-1">Observações do Cliente:</span>
+                    <p class="text-xs text-gray-300 italic bg-dark-850 p-2.5 rounded-lg border border-dark-800">
+                        "{{ appointment.notes }}"
+                    </p>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- Total / Rodapé do Ticket -->
+            <div class="pt-6 border-t border-dark-800 flex items-center justify-between">
+                <div>
+                    <span class="text-xs text-gray-400 block">Total a Pagar na Barbearia</span>
+                    <span class="text-xs text-gray-500">(Pix, Cartão ou Dinheiro)</span>
+                </div>
+                <div class="font-serif text-2xl font-black text-emerald-400">
+                    {{ appointment.package.price_formatted }}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- AÇÕES RÁPIDAS -->
+        <div class="space-y-3">
+            
+            <!-- Botão WhatsApp Direto -->
+            <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" 
+               class="w-full inline-flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-lg shadow-emerald-600/30 hover:scale-[1.01]">
+                <i class="fab fa-whatsapp text-lg"></i>
+                <span>Enviar Comprovante no WhatsApp da Barbearia</span>
+            </a>
+
+            <!-- Botão Google Calendar -->
+            {% set title_enc = (appointment.package.name + " - " + barbershop_name)|urlencode %}
+            {% set dt_start = appointment.appointment_date.strftime('%Y%m%dT%H%M%S') %}
+            {% set gcal_url = "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + title_enc + "&dates=" + dt_start + "/" + dt_start + "&details=Agendamento+confirmado&location=" + (barbershop_address|urlencode) %}
+            
+            <a href="{{ gcal_url }}" target="_blank" rel="noopener noreferrer" 
+               class="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-xs text-gray-300 bg-dark-850 hover:bg-dark-800 border border-dark-700 hover:border-gold-400/40 hover:text-white transition">
+                <i class="far fa-calendar-plus text-gold-400"></i>
+                <span>Adicionar ao Google Agenda</span>
+            </a>
+
+            <!-- Navegação -->
+            <div class="pt-4 flex items-center justify-center gap-6 text-xs text-gray-400">
+                <a href="{{ url_for('index') }}" class="hover:text-gold-400 transition flex items-center gap-1.5">
+                    <i class="fas fa-home"></i>
+                    <span>Voltar à Página Inicial</span>
+                </a>
+                <span>•</span>
+                <a href="{{ url_for('agendar') }}" class="hover:text-gold-400 transition flex items-center gap-1.5">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Agendar Outro Horário</span>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+

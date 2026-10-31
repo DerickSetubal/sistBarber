@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Área do Proprietário | {{ barbershop_name }}{% endblock %}
+
+{% block content %}
+<section class="min-h-[75vh] flex items-center justify-center py-12 px-4 relative">
+    
+    <!-- Glow de fundo -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[350px] bg-gold-400/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <div class="max-w-md w-full relative z-10">
+        
+        <!-- Cartão de Login -->
+        <div class="bg-dark-900 border border-dark-800 rounded-3xl p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+            
+            <div class="text-center mb-8 space-y-2">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-600 text-dark-950 flex items-center justify-center text-2xl mx-auto shadow-lg shadow-gold-500/30">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h1 class="font-serif text-2xl font-bold text-white">Painel Administrativo</h1>
+                <p class="text-xs text-gray-400">Entre com suas credenciais de proprietário para gerenciar a barbearia.</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('login') }}" class="space-y-5">
+                
+                <!-- Usuário -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">
+                        Usuário de Acesso
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                            <i class="fas fa-user text-xs"></i>
+                        </span>
+                        <input type="text" name="username" required placeholder="admin" autofocus
+                               class="w-full bg-dark-850 border border-dark-700 rounded-xl pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-gold-400 transition placeholder-gray-600">
+                    </div>
+                </div>
+
+                <!-- Senha -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">
+                        Senha
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                            <i class="fas fa-lock text-xs"></i>
+                        </span>
+                        <input type="password" name="password" id="password-field" required placeholder="••••••••"
+                               class="w-full bg-dark-850 border border-dark-700 rounded-xl pl-10 pr-10 py-3 text-white text-sm focus:outline-none focus:border-gold-400 transition placeholder-gray-600">
+                        <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-500 hover:text-gray-300">
+                            <i class="far fa-eye" id="eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lembrar & Dica -->
+                <div class="flex items-center justify-between text-xs">
+                    <label class="flex items-center gap-2 text-gray-400 cursor-pointer">
+                        <input type="checkbox" name="remember" class="rounded bg-dark-800 border-dark-700 text-gold-400 focus:ring-0">
+                        <span>Lembrar de mim</span>
+                    </label>
+                </div>
+
+                <!-- Botão Entrar -->
+                <button type="submit" class="w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-gradient-to-r from-gold-400 to-gold-600 hover:from-gold-300 hover:to-gold-500 text-dark-950 transition shadow-lg shadow-gold-500/25 active:scale-[0.98]">
+                    Entrar no Painel
+                </button>
+
+            </form>
+
+            <!-- Box com credenciais de demonstração -->
+            <div class="mt-8 pt-6 border-t border-dark-800 text-center">
+                <span class="text-[11px] uppercase tracking-wider text-gray-500 font-bold block mb-2">Credenciais Padrão do Sistema:</span>
+                <div class="inline-flex items-center gap-4 bg-dark-850 px-4 py-2 rounded-xl border border-dark-750 text-xs">
+                    <div>
+                        <span class="text-gray-400">Usuário:</span>
+                        <strong class="text-gold-400 font-mono ml-1">admin</strong>
+                    </div>
+                    <span class="text-dark-700">|</span>
+                    <div>
+                        <span class="text-gray-400">Senha:</span>
+                        <strong class="text-gold-400 font-mono ml-1">admin123</strong>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="text-center mt-6">
+            <a href="{{ url_for('index') }}" class="text-xs text-gray-400 hover:text-gold-400 transition inline-flex items-center gap-1.5">
+                <i class="fas fa-arrow-left"></i>
+                <span>Retornar à página pública</span>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<script>
+function togglePassword() {
+    const input = document.getElementById('password-field');
+    const icon = document.getElementById('eye-icon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>
+{% endblock %}
+

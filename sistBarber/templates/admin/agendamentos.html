@@ -1,0 +1,239 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_title %}Gestão Completa de Agendamentos{% endblock %}
+
+{% block admin_content %}
+<!-- BARRA DE FILTROS E PESQUISA -->
+<div class="bg-dark-900 border border-dark-800 rounded-3xl p-6 shadow-xl mb-8 space-y-4">
+    
+    <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+        
+        <!-- Filtros por Período -->
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs uppercase font-bold text-gray-500 mr-1">Período:</span>
+            
+            <a href="{{ url_for('admin_agendamentos', periodo='hoje', status=status_filter) }}" 
+               class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {% if date_filter == 'hoje' %}bg-gold-400 text-dark-950 font-bold{% else %}bg-dark-850 text-gray-300 hover:bg-dark-800 border border-dark-750{% endif %}">
+                Hoje
+            </a>
+            
+            <a href="{{ url_for('admin_agendamentos', periodo='amanha', status=status_filter) }}" 
+               class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {% if date_filter == 'amanha' %}bg-gold-400 text-dark-950 font-bold{% else %}bg-dark-850 text-gray-300 hover:bg-dark-800 border border-dark-750{% endif %}">
+                Amanhã
+            </a>
+            
+            <a href="{{ url_for('admin_agendamentos', periodo='semana', status=status_filter) }}" 
+               class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {% if date_filter == 'semana' %}bg-gold-400 text-dark-950 font-bold{% else %}bg-dark-850 text-gray-300 hover:bg-dark-800 border border-dark-750{% endif %}">
+                Esta Semana
+            </a>
+
+            <a href="{{ url_for('admin_agendamentos', periodo='mes', status=status_filter) }}" 
+               class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {% if date_filter == 'mes' %}bg-gold-400 text-dark-950 font-bold{% else %}bg-dark-850 text-gray-300 hover:bg-dark-800 border border-dark-750{% endif %}">
+                Este Mês
+            </a>
+
+            <a href="{{ url_for('admin_agendamentos', periodo='todos', status=status_filter) }}" 
+               class="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition {% if date_filter == 'todos' %}bg-gold-400 text-dark-950 font-bold{% else %}bg-dark-850 text-gray-300 hover:bg-dark-800 border border-dark-750{% endif %}">
+                Todos
+            </a>
+        </div>
+
+        <!-- Filtro por Status & Campo de Pesquisa em tempo real -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            
+            <div class="flex items-center gap-2">
+                <span class="text-xs uppercase font-bold text-gray-500">Status:</span>
+                <select onchange="window.location.href=this.value" class="bg-dark-850 border border-dark-750 text-xs text-white rounded-xl px-3 py-2 focus:outline-none focus:border-gold-400">
+                    <option value="{{ url_for('admin_agendamentos', periodo=date_filter, status='Todos') }}" {% if status_filter == 'Todos' %}selected{% endif %}>Todos os Status</option>
+                    <option value="{{ url_for('admin_agendamentos', periodo=date_filter, status='Pendente') }}" {% if status_filter == 'Pendente' %}selected{% endif %}>Pendente</option>
+                    <option value="{{ url_for('admin_agendamentos', periodo=date_filter, status='Confirmado') }}" {% if status_filter == 'Confirmado' %}selected{% endif %}>Confirmado</option>
+                    <option value="{{ url_for('admin_agendamentos', periodo=date_filter, status='Concluído') }}" {% if status_filter == 'Concluído' %}selected{% endif %}>Concluído</option>
+                    <option value="{{ url_for('admin_agendamentos', periodo=date_filter, status='Cancelado') }}" {% if status_filter == 'Cancelado' %}selected{% endif %}>Cancelado</option>
+                </select>
+            </div>
+
+            <!-- Busca Instantânea -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                    <i class="fas fa-search text-xs"></i>
+                </span>
+                <input type="text" id="table-search" placeholder="Buscar cliente..." 
+                       class="w-full sm:w-48 bg-dark-850 border border-dark-750 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-gold-400 transition placeholder-gray-600">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- TABELA DE AGENDAMENTOS -->
+<div class="bg-dark-900 border border-dark-800 rounded-3xl shadow-xl overflow-hidden">
+    
+    <div class="p-6 border-b border-dark-800 flex items-center justify-between">
+        <div>
+            <h2 class="font-serif text-lg font-bold text-white">Lista de Horários</h2>
+            <span class="text-xs text-gray-400">Total encontrado: <strong class="text-gold-400">{{ appointments|length }}</strong> agendamento(s)</span>
+        </div>
+
+        <a href="{{ url_for('agendar') }}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-gold-400 hover:bg-gold-500 text-dark-950 transition">
+            <i class="fas fa-plus"></i>
+            <span>Novo Agendamento</span>
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs" id="appointments-table">
+            <thead>
+                <tr class="bg-dark-850/60 text-gray-400 uppercase tracking-wider border-b border-dark-800">
+                    <th class="py-3.5 px-6">ID / Protocolo</th>
+                    <th class="py-3.5 px-4">Data & Horário</th>
+                    <th class="py-3.5 px-4">Cliente / Contato</th>
+                    <th class="py-3.5 px-4">Serviço / Valor</th>
+                    <th class="py-3.5 px-4">Status</th>
+                    <th class="py-3.5 px-4 text-center">Lembrete</th>
+                    <th class="py-3.5 px-6 text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-dark-800">
+                {% if appointments %}
+                    {% for appt in appointments %}
+                    <tr class="hover:bg-dark-850/40 transition appointment-row" data-client="{{ appt.client_name|lower }} {{ appt.client_phone }}">
+                        
+                        <!-- ID -->
+                        <td class="py-4 px-6 font-mono font-bold text-gray-400">
+                            #{{ "%04d"|format(appt.id) }}
+                        </td>
+
+                        <!-- Data / Hora -->
+                        <td class="py-4 px-4 whitespace-nowrap">
+                            <div class="font-semibold text-white">{{ appt.date_formatted }}</div>
+                            <div class="text-gold-400 font-bold flex items-center gap-1">
+                                <i class="far fa-clock text-[10px]"></i>
+                                {{ appt.time_formatted }}
+                            </div>
+                        </td>
+
+                        <!-- Cliente -->
+                        <td class="py-4 px-4">
+                            <div class="font-bold text-white text-sm">{{ appt.client_name }}</div>
+                            <div class="text-gray-400 flex items-center gap-2 mt-0.5">
+                                <span>{{ appt.client_phone }}</span>
+                                <a href="https://wa.me/{{ appt.phone_digits_only }}" target="_blank" title="Abrir WhatsApp" class="text-emerald-400 hover:text-emerald-300">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                            {% if appt.notes %}
+                            <div class="text-[10px] text-gray-500 italic mt-1 line-clamp-1" title="{{ appt.notes }}">
+                                Obs: {{ appt.notes }}
+                            </div>
+                            {% endif %}
+                        </td>
+
+                        <!-- Pacote -->
+                        <td class="py-4 px-4">
+                            <div class="font-medium text-white">{{ appt.package.name }}</div>
+                            <div class="text-emerald-400 font-bold">{{ appt.package.price_formatted }}</div>
+                        </td>
+
+                        <!-- Status Badge -->
+                        <td class="py-4 px-4">
+                            <span class="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold {{ appt.status_badge_class }}">
+                                {{ appt.status }}
+                            </span>
+                        </td>
+
+                        <!-- Lembrete Notificado -->
+                        <td class="py-4 px-4 text-center">
+                            {% if appt.notification_sent %}
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" title="Notificação já enviada">
+                                    <i class="fas fa-check"></i> Enviado
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] bg-gray-800 text-gray-400 border border-gray-700" title="Ainda não notificado">
+                                    <i class="far fa-clock"></i> Pendente
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Ações -->
+                        <td class="py-4 px-6 text-right whitespace-nowrap">
+                            <div class="inline-flex items-center gap-1.5">
+                                
+                                <!-- Alterar Status Rápido -->
+                                {% if appt.status == 'Pendente' %}
+                                <form action="{{ url_for('update_appointment_status', id=appt.id) }}" method="POST" class="inline">
+                                    <input type="hidden" name="status" value="Confirmado">
+                                    <button type="submit" title="Confirmar Horário" class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white transition">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                {% if appt.status != 'Concluído' and appt.status != 'Cancelado' %}
+                                <form action="{{ url_for('update_appointment_status', id=appt.id) }}" method="POST" class="inline">
+                                    <input type="hidden" name="status" value="Concluído">
+                                    <button type="submit" title="Marcar como Concluído" class="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition">
+                                        <i class="fas fa-check-double"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                {% if appt.status != 'Cancelado' %}
+                                <form action="{{ url_for('update_appointment_status', id=appt.id) }}" method="POST" class="inline" onsubmit="return confirm('Tem certeza que deseja cancelar este agendamento?')">
+                                    <input type="hidden" name="status" value="Cancelado">
+                                    <button type="submit" title="Cancelar Agendamento" class="p-2 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-white transition">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                <!-- Botão Disparar Lembrete Imediato -->
+                                <form action="{{ url_for('send_single_notification', id=appt.id) }}" method="POST" class="inline">
+                                    <button type="submit" title="Simular Disparo Imediato de Notificação (Console & Painel)" class="p-2 rounded-lg bg-gold-400/10 text-gold-400 hover:bg-gold-400 hover:text-dark-950 transition">
+                                        <i class="fas fa-bell"></i>
+                                    </button>
+                                </form>
+
+                                <!-- Excluir -->
+                                <form action="{{ url_for('delete_appointment', id=appt.id) }}" method="POST" class="inline" onsubmit="return confirm('Excluir este agendamento permanentemente?')">
+                                    <button type="submit" title="Excluir do Sistema" class="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-gray-500">
+                            <i class="fas fa-inbox text-3xl mb-2 block text-gray-600"></i>
+                            Nenhum agendamento encontrado com os filtros atuais.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    // Filtro instantâneo no frontend
+    document.getElementById('table-search').addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll('.appointment-row').forEach(row => {
+            const data = row.dataset.client;
+            if (data.includes(query)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}
+

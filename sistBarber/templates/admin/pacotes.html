@@ -1,0 +1,232 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_title %}Gestão de Preços & Pacotes de Serviços{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-8">
+    
+    <!-- HEADER DA GESTÃO & BOTÃO NOVO PACOTE -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-dark-900 border border-dark-800 rounded-3xl p-6 shadow-xl">
+        <div>
+            <h2 class="font-serif text-lg font-bold text-white flex items-center gap-2">
+                <i class="fas fa-tags text-gold-400"></i>
+                <span>Catálogo de Serviços da Barbearia</span>
+            </h2>
+            <p class="text-xs text-gray-400 mt-1">
+                Adicione novos serviços, altere preços e durações em tempo real. As alterações entram em vigor imediatamente na página dos clientes.
+            </p>
+        </div>
+
+        <button onclick="openCreateModal()" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider bg-gold-400 hover:bg-gold-500 text-dark-950 transition shadow-lg shadow-gold-500/20">
+            <i class="fas fa-plus"></i>
+            <span>Criar Novo Pacote</span>
+        </button>
+    </div>
+
+    <!-- LISTAGEM DE PACOTES EXISTENTES -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for pkg in packages %}
+        <div class="bg-dark-900 border {% if pkg.is_active %}border-dark-800 hover:border-gold-400/40{% else %}border-rose-950/40 opacity-70{% endif %} rounded-3xl p-6 flex flex-col justify-between shadow-xl transition duration-200 relative group">
+            
+            <!-- Badge de Status Ativo/Inativo -->
+            <div class="flex items-center justify-between mb-4">
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {% if pkg.is_active %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/30{% else %}bg-rose-500/10 text-rose-400 border border-rose-500/30{% endif %}">
+                    {% if pkg.is_active %}● Ativo no Site{% else %}○ Oculto{% endif %}
+                </span>
+
+                <span class="text-xs text-gray-400 flex items-center gap-1.5">
+                    <i class="far fa-clock text-gold-400"></i>
+                    {{ pkg.duration_formatted }}
+                </span>
+            </div>
+
+            <!-- Dados do Pacote -->
+            <div class="space-y-2 mb-6">
+                <h3 class="font-serif text-xl font-bold text-white group-hover:text-gold-400 transition">
+                    {{ pkg.name }}
+                </h3>
+                <p class="text-xs text-gray-400 leading-relaxed min-h-[48px]">
+                    {{ pkg.description or "Sem descrição cadastrada." }}
+                </p>
+                <div class="pt-3 border-t border-dark-800 flex items-baseline justify-between">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Preço Atual:</span>
+                    <span class="font-serif text-2xl font-black text-emerald-400">
+                        {{ pkg.price_formatted }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Barra de Ações (Editar, Toggle, Excluir) -->
+            <div class="pt-4 border-t border-dark-800 flex items-center justify-between gap-2">
+                
+                <!-- Botão Editar -->
+                <button onclick="openEditModal({{ pkg.id }}, '{{ pkg.name|escape }}', '{{ pkg.description|escape }}', {{ pkg.price }}, {{ pkg.duration_minutes }}, {{ 'true' if pkg.is_active else 'false' }})" 
+                        class="flex-1 py-2 px-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-dark-800 hover:bg-gold-400 text-gold-400 hover:text-dark-950 border border-gold-400/30 hover:border-gold-400 transition text-center">
+                    <i class="fas fa-edit mr-1"></i> Editar
+                </button>
+
+                <!-- Botão Ativar/Desativar -->
+                <form action="{{ url_for('toggle_package', id=pkg.id) }}" method="POST" class="inline">
+                    <button type="submit" title="{% if pkg.is_active %}Desativar Pacote{% else %}Ativar Pacote{% endif %}" 
+                            class="p-2 rounded-xl text-xs {% if pkg.is_active %}bg-dark-800 text-amber-400 hover:bg-amber-400 hover:text-dark-950 border border-dark-700{% else %}bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30{% endif %} transition">
+                        <i class="fas {% if pkg.is_active %}fa-eye-slash{% else %}fa-eye{% endif %}"></i>
+                    </button>
+                </form>
+
+                <!-- Botão Excluir -->
+                <form action="{{ url_for('delete_package', id=pkg.id) }}" method="POST" class="inline" onsubmit="return confirm('Deseja realmente excluir este pacote? Se houver histórico, ele será apenas desativado.')">
+                    <button type="submit" title="Excluir Pacote" class="p-2 rounded-xl text-xs bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 transition">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<!-- MODAL: CRIAR NOVO PACOTE -->
+<div id="modal-create" class="fixed inset-0 z-50 bg-dark-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-dark-900 border border-dark-750 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative">
+        <button onclick="closeCreateModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white p-1">
+            <i class="fas fa-times text-lg"></i>
+        </button>
+
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-gold-400/10 border border-gold-400/30 flex items-center justify-center text-gold-400">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div>
+                <h3 class="font-serif text-xl font-bold text-white">Novo Pacote de Serviço</h3>
+                <p class="text-xs text-gray-400">Preencha os dados que serão exibidos aos clientes.</p>
+            </div>
+        </div>
+
+        <form action="{{ url_for('create_package') }}" method="POST" class="space-y-4">
+            
+            <div class="space-y-1.5">
+                <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">Nome do Pacote *</label>
+                <input type="text" name="name" required placeholder="Ex: Combo VIP Barba & Cabelo" 
+                       class="w-full bg-dark-850 border border-dark-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold-400 transition placeholder-gray-600">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">Preço (R$) *</label>
+                    <input type="text" name="price" required placeholder="95,00" 
+                           class="w-full bg-dark-850 border border-dark-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold-400 transition placeholder-gray-600">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">Duração (Minutos) *</label>
+                    <input type="number" name="duration_minutes" value="45" min="15" step="5" required 
+                           class="w-full bg-dark-850 border border-dark-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold-400 transition">
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">Descrição dos Benefícios</label>
+                <textarea name="description" rows="3" placeholder="Detalhes do que está incluso no pacote (ex: toalha quente, navalha, pomada)..." 
+                          class="w-full bg-dark-850 border border-dark-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold-400 transition placeholder-gray-600"></textarea>
+            </div>
+
+            <div class="pt-4 flex items-center justify-end gap-3 border-t border-dark-800">
+                <button type="button" onclick="closeCreateModal()" class="px-5 py-2.5 rounded-xl text-xs font-semibold text-gray-400 hover:text-white bg-dark-800 hover:bg-dark-750 transition">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-gold-400 hover:bg-gold-500 text-dark-950 transition shadow-lg shadow-gold-500/20">
+                    Salvar e Publicar
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: EDITAR PACOTE -->
+<div id="modal-edit" class="fixed inset-0 z-50 bg-dark-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-dark-900 border border-dark-750 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative">
+        <button onclick="closeEditModal()" class="absolute top-5 right-5 text-gray-400 hover:text-white p-1">
+            <i class="fas fa-times text-lg"></i>
+        </button>
+
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-gold-400/10 border border-gold-400/30 flex items-center justify-center text-gold-400">
+                <i class="fas fa-edit"></i>
+            </div>
+            <div>
+                <h3 class="font-serif text-xl font-bold text-white">Editar Pacote & Preço</h3>
+                <p class="text-xs text-gray-400">Atualize o valor ou a descrição do serviço.</p>
+            </div>
+        </div>
+
+        <form id="form-edit" method="POST" action="" class="space-y-4">
+            
+            <div class="space-y-1.5">
+                <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">Nome do Pacote *</label>
+                <input type="text" name="name" id="edit-name" required 
+                       class="w-full bg-dark-850 border border-dark-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold-400 transition">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">Preço (R$) *</label>
+                    <input type="text" name="price" id="edit-price" required 
+                           class="w-full bg-dark-850 border border-dark-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold-400 transition">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">Duração (Minutos) *</label>
+                    <input type="number" name="duration_minutes" id="edit-duration" min="15" step="5" required 
+                           class="w-full bg-dark-850 border border-dark-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold-400 transition">
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">Descrição</label>
+                <textarea name="description" id="edit-description" rows="3" 
+                          class="w-full bg-dark-850 border border-dark-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold-400 transition"></textarea>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+                <input type="checkbox" name="is_active" id="edit-active" value="true" class="rounded bg-dark-800 border-dark-700 text-gold-400 focus:ring-0">
+                <label for="edit-active" class="text-xs text-gray-300 cursor-pointer">Pacote ativo e visível na página inicial</label>
+            </div>
+
+            <div class="pt-4 flex items-center justify-end gap-3 border-t border-dark-800">
+                <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 rounded-xl text-xs font-semibold text-gray-400 hover:text-white bg-dark-800 hover:bg-dark-750 transition">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-gold-400 hover:bg-gold-500 text-dark-950 transition shadow-lg shadow-gold-500/20">
+                    Salvar Alterações
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+function openCreateModal() {
+    document.getElementById('modal-create').classList.remove('hidden');
+}
+function closeCreateModal() {
+    document.getElementById('modal-create').classList.add('hidden');
+}
+
+function openEditModal(id, name, description, price, duration, isActive) {
+    document.getElementById('form-edit').action = `/admin/pacotes/${id}/editar`;
+    document.getElementById('edit-name').value = name;
+    document.getElementById('edit-description').value = description;
+    document.getElementById('edit-price').value = price.toFixed(2).replace('.', ',');
+    document.getElementById('edit-duration').value = duration;
+    document.getElementById('edit-active').checked = isActive;
+    document.getElementById('modal-edit').classList.remove('hidden');
+}
+function closeEditModal() {
+    document.getElementById('modal-edit').classList.add('hidden');
+}
+</script>
+{% endblock %}
+

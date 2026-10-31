@@ -1,0 +1,524 @@
+{% extends 'base.html' %}
+
+{% block title %}Agendar Horário | {{ barbershop_name }}{% endblock %}
+
+{% block content %}
+<section class="py-12 md:py-20 relative">
+    
+    <!-- Glow de fundo -->
+    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-gold-400/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        <!-- Header da Página -->
+        <div class="text-center mb-10 space-y-3">
+            <span class="text-xs font-bold tracking-[0.2em] text-gold-400 uppercase">Reserva Rápida & Descomplicada</span>
+            <h1 class="font-serif text-3xl sm:text-4xl font-extrabold text-white">
+                Agende Seu Momento Exclusivo
+            </h1>
+            <p class="text-gray-400 text-sm max-w-lg mx-auto">
+                Siga as 3 etapas abaixo para garantir sua cadeira com um dos nossos barbeiros especialistas.
+            </p>
+        </div>
+
+        <!-- PROGRESS BAR / STEPPER -->
+        <div class="mb-10 bg-dark-900 border border-dark-800 rounded-2xl p-4 sm:p-6 shadow-xl">
+            <div class="flex items-center justify-between relative">
+                
+                <!-- Linha de conexão entre os passos -->
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-dark-800 w-full z-0"></div>
+                <div id="progress-line" class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-gold-400 transition-all duration-300 z-0" style="width: 0%;"></div>
+
+                <!-- Passo 1 -->
+                <div class="relative z-10 flex flex-col items-center">
+                    <div id="step-badge-1" class="w-10 h-10 rounded-full bg-gold-400 text-dark-950 font-bold flex items-center justify-center text-sm shadow-lg shadow-gold-500/30 transition-all duration-300">
+                        1
+                    </div>
+                    <span id="step-label-1" class="text-xs font-semibold text-gold-400 mt-2">1. Pacote</span>
+                </div>
+
+                <!-- Passo 2 -->
+                <div class="relative z-10 flex flex-col items-center">
+                    <div id="step-badge-2" class="w-10 h-10 rounded-full bg-dark-800 border border-dark-700 text-gray-400 font-bold flex items-center justify-center text-sm transition-all duration-300">
+                        2
+                    </div>
+                    <span id="step-label-2" class="text-xs font-semibold text-gray-500 mt-2">2. Data & Hora</span>
+                </div>
+
+                <!-- Passo 3 -->
+                <div class="relative z-10 flex flex-col items-center">
+                    <div id="step-badge-3" class="w-10 h-10 rounded-full bg-dark-800 border border-dark-700 text-gray-400 font-bold flex items-center justify-center text-sm transition-all duration-300">
+                        3
+                    </div>
+                    <span id="step-label-3" class="text-xs font-semibold text-gray-500 mt-2">3. Seus Dados</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FORMULÁRIO WIZARD -->
+        <form id="booking-form" method="POST" action="{{ url_for('agendar') }}" class="bg-dark-900 border border-dark-800 rounded-3xl p-6 sm:p-10 shadow-2xl">
+            
+            <!-- ETAPA 1: ESCOLHER O PACOTE -->
+            <div id="step-1" class="step-content space-y-6">
+                <div>
+                    <h2 class="font-serif text-2xl font-bold text-white mb-1">Passo 1: Selecione o Serviço Desejado</h2>
+                    <p class="text-xs sm:text-sm text-gray-400">Clique sobre o pacote que melhor atende o que você precisa hoje.</p>
+                </div>
+
+                <!-- Grid de Serviços -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for pkg in packages %}
+                    <label class="package-option cursor-pointer relative block p-5 rounded-2xl bg-dark-850 border-2 {% if selected_package_id == pkg.id %}border-gold-400 bg-gold-400/5{% else %}border-dark-750 hover:border-dark-600{% endif %} transition-all duration-200">
+                        <input type="radio" name="package_id" value="{{ pkg.id }}" 
+                               data-name="{{ pkg.name }}" 
+                               data-price="{{ pkg.price_formatted }}" 
+                               data-duration="{{ pkg.duration_formatted }}"
+                               {% if selected_package_id == pkg.id %}checked{% endif %}
+                               class="hidden package-radio" required>
+                        
+                        <div class="flex items-start justify-between gap-3 mb-2">
+                            <span class="font-serif text-base font-bold text-white package-title">
+                                {{ pkg.name }}
+                            </span>
+                            <div class="check-icon w-6 h-6 rounded-full border border-dark-600 flex items-center justify-center text-xs {% if selected_package_id == pkg.id %}bg-gold-400 text-dark-950 border-gold-400{% else %}text-transparent{% endif %}">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-gray-400 line-clamp-2 mb-4 leading-relaxed">
+                            {{ pkg.description or "Atendimento completo com produtos selecionados." }}
+                        </p>
+
+                        <div class="flex items-center justify-between text-xs pt-3 border-t border-dark-800">
+                            <span class="text-gray-400 flex items-center gap-1.5">
+                                <i class="far fa-clock text-gold-400"></i>
+                                {{ pkg.duration_formatted }}
+                            </span>
+                            <span class="font-serif text-lg font-bold text-gold-400">
+                                {{ pkg.price_formatted }}
+                            </span>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="pt-6 flex justify-end">
+                    <button type="button" id="btn-to-step-2" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-gold-400 hover:bg-gold-500 text-dark-950 transition shadow-lg shadow-gold-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span>Avançar para Data e Horário</span>
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ETAPA 2: ESCOLHER DATA E HORÁRIO -->
+            <div id="step-2" class="step-content hidden space-y-6">
+                <div>
+                    <h2 class="font-serif text-2xl font-bold text-white mb-1">Passo 2: Escolha a Data e o Horário</h2>
+                    <p class="text-xs sm:text-sm text-gray-400">Selecione o dia e um dos horários disponíveis na agenda.</p>
+                </div>
+
+                <!-- Seletor de Data -->
+                <div class="space-y-3">
+                    <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">Data do Atendimento</label>
+                    
+                    <!-- Atalhos rápidos de data -->
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <button type="button" class="date-quick-btn px-4 py-2 rounded-xl text-xs font-semibold bg-dark-800 border border-dark-700 hover:border-gold-400/50 text-gray-300 hover:text-white transition" data-days="0">
+                            Hoje
+                        </button>
+                        <button type="button" class="date-quick-btn px-4 py-2 rounded-xl text-xs font-semibold bg-dark-800 border border-dark-700 hover:border-gold-400/50 text-gray-300 hover:text-white transition" data-days="1">
+                            Amanhã
+                        </button>
+                        <button type="button" class="date-quick-btn px-4 py-2 rounded-xl text-xs font-semibold bg-dark-800 border border-dark-700 hover:border-gold-400/50 text-gray-300 hover:text-white transition" data-days="2">
+                            Depois de Amanhã
+                        </button>
+                    </div>
+
+                    <div class="relative max-w-sm">
+                        <input type="date" id="appointment_date" name="appointment_date" 
+                               class="w-full bg-dark-850 border border-dark-700 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-gold-400 transition [color-scheme:dark]" required>
+                    </div>
+                </div>
+
+                <!-- Horários Disponíveis -->
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">
+                            Horários Disponíveis <span id="slots-loading" class="text-gold-400 hidden text-xs ml-2"><i class="fas fa-spinner fa-spin"></i> carregando horários...</span>
+                        </label>
+                        <span class="text-xs text-gray-500">Intervalo de 30 min</span>
+                    </div>
+
+                    <input type="hidden" id="appointment_time" name="appointment_time" required>
+
+                    <!-- Container onde os slots dinâmicos serão renderizados -->
+                    <div id="slots-container" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
+                        <!-- Gerado via JavaScript baseado na rota /api/available-slots -->
+                    </div>
+
+                    <p id="no-slots-warning" class="hidden text-amber-400 text-xs bg-amber-400/10 p-3 rounded-xl border border-amber-400/20">
+                        <i class="fas fa-exclamation-circle mr-1"></i> Não há horários vagos para o dia selecionado. Por favor, escolha outra data.
+                    </p>
+                </div>
+
+                <!-- Ações do Passo 2 -->
+                <div class="pt-6 flex items-center justify-between border-t border-dark-800">
+                    <button type="button" id="btn-back-to-1" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-xs text-gray-400 hover:text-white bg-dark-800 hover:bg-dark-750 transition">
+                        <i class="fas fa-arrow-left text-xs"></i>
+                        <span>Voltar</span>
+                    </button>
+                    <button type="button" id="btn-to-step-3" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-gold-400 hover:bg-gold-500 text-dark-950 transition shadow-lg shadow-gold-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span>Avançar para Seus Dados</span>
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ETAPA 3: DADOS DE CONTATO E CONFIRMAÇÃO -->
+            <div id="step-3" class="step-content hidden space-y-6">
+                <div>
+                    <h2 class="font-serif text-2xl font-bold text-white mb-1">Passo 3: Seus Dados de Contato</h2>
+                    <p class="text-xs sm:text-sm text-gray-400">Usaremos seu WhatsApp para enviar a confirmação e o lembrete prévio do horário.</p>
+                </div>
+
+                <!-- Resumo Prévio do Agendamento -->
+                <div class="bg-dark-850 border border-gold-400/30 rounded-2xl p-5 shadow-inner space-y-3">
+                    <div class="text-xs font-bold uppercase tracking-wider text-gold-400 flex items-center gap-2">
+                        <i class="fas fa-receipt"></i>
+                        <span>Resumo do Horário Selecionado</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                        <div>
+                            <span class="text-xs text-gray-500 block">Pacote:</span>
+                            <span id="summary-package" class="font-bold text-white">-</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-500 block">Data & Horário:</span>
+                            <span id="summary-datetime" class="font-bold text-gold-400">-</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-500 block">Investimento:</span>
+                            <span id="summary-price" class="font-bold text-emerald-400 text-base">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campos de Contato -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    
+                    <div class="space-y-1.5">
+                        <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">
+                            Nome Completo *
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                                <i class="fas fa-user text-xs"></i>
+                            </span>
+                            <input type="text" name="client_name" id="client_name" required placeholder="Ex: Lucas Mendes"
+                                   class="w-full bg-dark-850 border border-dark-700 rounded-xl pl-10 pr-4 py-3.5 text-white text-sm focus:outline-none focus:border-gold-400 transition placeholder-gray-600">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">
+                            WhatsApp / Celular *
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-400">
+                                <i class="fab fa-whatsapp text-sm"></i>
+                            </span>
+                            <input type="tel" name="client_phone" id="client_phone" required placeholder="(11) 98765-4321"
+                                   class="w-full bg-dark-850 border border-dark-700 rounded-xl pl-10 pr-4 py-3.5 text-white text-sm focus:outline-none focus:border-gold-400 transition placeholder-gray-600">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5 sm:col-span-2">
+                        <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">
+                            E-mail (Opcional)
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                                <i class="fas fa-envelope text-xs"></i>
+                            </span>
+                            <input type="email" name="client_email" id="client_email" placeholder="seuemail@exemplo.com"
+                                   class="w-full bg-dark-850 border border-dark-700 rounded-xl pl-10 pr-4 py-3.5 text-white text-sm focus:outline-none focus:border-gold-400 transition placeholder-gray-600">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5 sm:col-span-2">
+                        <label class="block text-xs uppercase font-bold text-gray-300 tracking-wider">
+                            Observações ou Preferências Especiais (Opcional)
+                        </label>
+                        <textarea name="notes" id="notes" rows="2" placeholder="Ex: Prefiro navalhete baixo, cabelo curto nas laterais..."
+                                  class="w-full bg-dark-850 border border-dark-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gold-400 transition placeholder-gray-600"></textarea>
+                    </div>
+
+                </div>
+
+                <!-- Ações Finais -->
+                <div class="pt-6 flex items-center justify-between border-t border-dark-800">
+                    <button type="button" id="btn-back-to-2" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-xs text-gray-400 hover:text-white bg-dark-800 hover:bg-dark-750 transition">
+                        <i class="fas fa-arrow-left text-xs"></i>
+                        <span>Voltar</span>
+                    </button>
+                    
+                    <button type="submit" id="btn-submit" class="inline-flex items-center gap-3 px-10 py-4 rounded-xl font-bold text-xs uppercase tracking-wider bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white transition shadow-xl shadow-emerald-500/20 active:scale-95">
+                        <i class="fas fa-check-circle text-base"></i>
+                        <span>Confirmar Agendamento</span>
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Gerenciador do Wizard de Agendamento
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentStep = 1;
+        const totalSteps = 3;
+        
+        // Elementos dos passos
+        const step1 = document.getElementById('step-1');
+        const step2 = document.getElementById('step-2');
+        const step3 = document.getElementById('step-3');
+        
+        const badge1 = document.getElementById('step-badge-1');
+        const badge2 = document.getElementById('step-badge-2');
+        const badge3 = document.getElementById('step-badge-3');
+        
+        const label1 = document.getElementById('step-label-1');
+        const label2 = document.getElementById('step-label-2');
+        const label3 = document.getElementById('step-label-3');
+        
+        const progressLine = document.getElementById('progress-line');
+        
+        // Botões de navegação
+        const btnToStep2 = document.getElementById('btn-to-step-2');
+        const btnBackTo1 = document.getElementById('btn-back-to-1');
+        const btnToStep3 = document.getElementById('btn-to-step-3');
+        const btnBackTo2 = document.getElementById('btn-back-to-2');
+        
+        // Entradas de dados
+        const dateInput = document.getElementById('appointment_date');
+        const timeInput = document.getElementById('appointment_time');
+        const slotsContainer = document.getElementById('slots-container');
+        const slotsLoading = document.getElementById('slots-loading');
+        const noSlotsWarning = document.getElementById('no-slots-warning');
+        
+        // Definir data mínima como hoje
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const minDateStr = `${yyyy}-${mm}-${dd}`;
+        dateInput.min = minDateStr;
+        dateInput.value = minDateStr;
+        
+        // Seleção de Pacote
+        const packageOptions = document.querySelectorAll('.package-option');
+        let selectedPackageData = null;
+
+        function updatePackageSelection() {
+            packageOptions.forEach(opt => {
+                const radio = opt.querySelector('.package-radio');
+                const checkIcon = opt.querySelector('.check-icon');
+                if (radio.checked) {
+                    opt.classList.add('border-gold-400', 'bg-gold-400/5');
+                    opt.classList.remove('border-dark-750');
+                    checkIcon.classList.add('bg-gold-400', 'text-dark-950', 'border-gold-400');
+                    checkIcon.classList.remove('text-transparent');
+                    selectedPackageData = {
+                        id: radio.value,
+                        name: radio.dataset.name,
+                        price: radio.dataset.price,
+                        duration: radio.dataset.duration
+                    };
+                } else {
+                    opt.classList.remove('border-gold-400', 'bg-gold-400/5');
+                    opt.classList.add('border-dark-750');
+                    checkIcon.classList.remove('bg-gold-400', 'text-dark-950', 'border-gold-400');
+                    checkIcon.classList.add('text-transparent');
+                }
+            });
+        }
+        
+        packageOptions.forEach(opt => {
+            opt.addEventListener('click', function() {
+                const radio = this.querySelector('.package-radio');
+                radio.checked = true;
+                updatePackageSelection();
+            });
+        });
+        updatePackageSelection();
+
+        // Atalhos de Data (Hoje, Amanhã, Depois de amanhã)
+        document.querySelectorAll('.date-quick-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const addDays = parseInt(this.dataset.days);
+                const target = new Date();
+                target.setDate(target.getDate() + addDays);
+                const tY = target.getFullYear();
+                const tM = String(target.getMonth() + 1).padStart(2, '0');
+                const tD = String(target.getDate()).padStart(2, '0');
+                dateInput.value = `${tY}-${tM}-${tD}`;
+                loadAvailableSlots(dateInput.value);
+            });
+        });
+
+        // Carregar horários disponíveis via API
+        async function loadAvailableSlots(dateStr) {
+            if (!dateStr) return;
+            slotsLoading.classList.remove('hidden');
+            slotsContainer.innerHTML = '';
+            noSlotsWarning.classList.add('hidden');
+            timeInput.value = '';
+
+            try {
+                const response = await fetch(`/api/available-slots?date=${dateStr}`);
+                const data = await response.json();
+                slotsLoading.classList.add('hidden');
+
+                if (!data.slots || data.slots.length === 0) {
+                    noSlotsWarning.classList.remove('hidden');
+                    return;
+                }
+
+                let availableCount = 0;
+                data.slots.forEach(slot => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.textContent = slot.time;
+                    btn.dataset.time = slot.time;
+
+                    if (slot.available) {
+                        availableCount++;
+                        btn.className = 'slot-btn py-2.5 px-3 rounded-xl text-xs font-semibold bg-dark-800 border border-dark-700 text-gray-200 hover:border-gold-400 hover:text-gold-400 transition';
+                        btn.addEventListener('click', function() {
+                            document.querySelectorAll('.slot-btn').forEach(b => {
+                                b.classList.remove('bg-gold-400', 'text-dark-950', 'border-gold-400', 'font-bold');
+                                b.classList.add('bg-dark-800', 'text-gray-200');
+                            });
+                            this.classList.remove('bg-dark-800', 'text-gray-200');
+                            this.classList.add('bg-gold-400', 'text-dark-950', 'border-gold-400', 'font-bold');
+                            timeInput.value = this.dataset.time;
+                        });
+                    } else {
+                        btn.className = 'py-2.5 px-3 rounded-xl text-xs font-semibold bg-dark-950/60 border border-dark-850 text-gray-600 cursor-not-allowed opacity-50 line-through';
+                        btn.disabled = true;
+                        btn.title = slot.reason;
+                    }
+                    slotsContainer.appendChild(btn);
+                });
+
+                if (availableCount === 0) {
+                    noSlotsWarning.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Erro ao carregar horários:", err);
+                slotsLoading.classList.add('hidden');
+            }
+        }
+
+        dateInput.addEventListener('change', function() {
+            loadAvailableSlots(this.value);
+        });
+
+        // Navegação do Stepper
+        function goToStep(step) {
+            currentStep = step;
+            step1.classList.add('hidden');
+            step2.classList.add('hidden');
+            step3.classList.add('hidden');
+
+            if (step === 1) {
+                step1.classList.remove('hidden');
+                progressLine.style.width = '0%';
+                badge1.className = 'w-10 h-10 rounded-full bg-gold-400 text-dark-950 font-bold flex items-center justify-center text-sm shadow-lg shadow-gold-500/30';
+                badge2.className = 'w-10 h-10 rounded-full bg-dark-800 border border-dark-700 text-gray-400 font-bold flex items-center justify-center text-sm';
+                badge3.className = 'w-10 h-10 rounded-full bg-dark-800 border border-dark-700 text-gray-400 font-bold flex items-center justify-center text-sm';
+                label1.className = 'text-xs font-semibold text-gold-400 mt-2';
+                label2.className = 'text-xs font-semibold text-gray-500 mt-2';
+                label3.className = 'text-xs font-semibold text-gray-500 mt-2';
+            } else if (step === 2) {
+                step2.classList.remove('hidden');
+                progressLine.style.width = '50%';
+                badge1.className = 'w-10 h-10 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center text-sm';
+                badge1.innerHTML = '<i class="fas fa-check"></i>';
+                badge2.className = 'w-10 h-10 rounded-full bg-gold-400 text-dark-950 font-bold flex items-center justify-center text-sm shadow-lg shadow-gold-500/30';
+                badge3.className = 'w-10 h-10 rounded-full bg-dark-800 border border-dark-700 text-gray-400 font-bold flex items-center justify-center text-sm';
+                label2.className = 'text-xs font-semibold text-gold-400 mt-2';
+                label3.className = 'text-xs font-semibold text-gray-500 mt-2';
+                loadAvailableSlots(dateInput.value);
+            } else if (step === 3) {
+                step3.classList.remove('hidden');
+                progressLine.style.width = '100%';
+                badge2.className = 'w-10 h-10 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center text-sm';
+                badge2.innerHTML = '<i class="fas fa-check"></i>';
+                badge3.className = 'w-10 h-10 rounded-full bg-gold-400 text-dark-950 font-bold flex items-center justify-center text-sm shadow-lg shadow-gold-500/30';
+                label3.className = 'text-xs font-semibold text-gold-400 mt-2';
+
+                // Atualizar resumo do Passo 3
+                if (selectedPackageData) {
+                    document.getElementById('summary-package').textContent = selectedPackageData.name;
+                    document.getElementById('summary-price').textContent = selectedPackageData.price;
+                }
+                const [y, m, d] = dateInput.value.split('-');
+                document.getElementById('summary-datetime').textContent = `${d}/${m}/${y} às ${timeInput.value}`;
+            }
+            window.scrollTo({ top: 100, behavior: 'smooth' });
+        }
+
+        btnToStep2.addEventListener('click', function() {
+            const selectedRadio = document.querySelector('.package-radio:checked');
+            if (!selectedRadio) {
+                alert('Por favor, selecione um serviço para continuar.');
+                return;
+            }
+            goToStep(2);
+        });
+
+        btnBackTo1.addEventListener('click', function() {
+            badge1.innerHTML = '1';
+            goToStep(1);
+        });
+
+        btnToStep3.addEventListener('click', function() {
+            if (!dateInput.value) {
+                alert('Por favor, selecione uma data válida.');
+                return;
+            }
+            if (!timeInput.value) {
+                alert('Por favor, selecione um horário disponível na lista.');
+                return;
+            }
+            goToStep(3);
+        });
+
+        btnBackTo2.addEventListener('click', function() {
+            badge2.innerHTML = '2';
+            goToStep(2);
+        });
+
+        // Máscara simples para telefone/WhatsApp
+        const phoneInput = document.getElementById('client_phone');
+        phoneInput.addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            if (v.length > 11) v = v.substring(0, 11);
+            if (v.length > 6) {
+                e.target.value = `(${v.substring(0,2)}) ${v.substring(2,7)}-${v.substring(7)}`;
+            } else if (v.length > 2) {
+                e.target.value = `(${v.substring(0,2)}) ${v.substring(2)}`;
+            } else if (v.length > 0) {
+                e.target.value = `(${v}`;
+            }
+        });
+    });
+</script>
+{% endblock %}
+

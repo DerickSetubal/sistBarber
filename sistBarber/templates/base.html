@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ barbershop_name }}{% endblock %} | Sistema de Agendamentos</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            50: '#FDFBF7',
+                            100: '#F7F2E7',
+                            200: '#EFE2C7',
+                            300: '#E4CEA0',
+                            400: '#D4AF37', /* Tom clássico de barbearia ouro */
+                            500: '#C29B27',
+                            600: '#A47F18',
+                            700: '#7E5F11',
+                            800: '#58410B',
+                            900: '#352605',
+                        },
+                        dark: {
+                            950: '#070A0F',
+                            900: '#0B0F17',
+                            850: '#101726',
+                            800: '#161F33',
+                            700: '#222F4C',
+                            600: '#324368',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Cinzel"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom scrollbar & luxury glow */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0F17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222F4C;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FDFBF7 0%, #E4CEA0 40%, #D4AF37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-border-glow {
+            box-shadow: 0 0 25px -5px rgba(212, 175, 55, 0.15);
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-dark-950 text-gray-100 font-sans antialiased min-h-screen flex flex-col selection:bg-gold-400 selection:text-dark-950">
+
+    <!-- NAVBAR PÚBLICA -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-dark-900/90 border-b border-dark-800 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo -->
+                <a href="{{ url_for('index') }}" class="flex items-center gap-3 group">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-dark-950 shadow-lg shadow-gold-500/20 group-hover:scale-105 transition-transform duration-300">
+                        <i class="fas fa-scissors text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="font-serif tracking-wider font-bold text-lg md:text-xl text-white block leading-none">
+                            BARBER<span class="text-gold-400">SHOP</span>
+                        </span>
+                        <span class="text-[10px] tracking-[0.25em] text-gray-400 uppercase font-medium">Premium Grooming</span>
+                    </div>
+                </a>
+
+                <!-- Nav Links Desktop -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="{{ url_for('index') }}" class="text-sm font-medium text-gray-300 hover:text-gold-400 transition-colors">Início</a>
+                    <a href="{{ url_for('index') }}#servicos" class="text-sm font-medium text-gray-300 hover:text-gold-400 transition-colors">Serviços & Pacotes</a>
+                    <a href="{{ url_for('index') }}#galeria" class="text-sm font-medium text-gray-300 hover:text-gold-400 transition-colors">Galeria</a>
+                    <a href="{{ url_for('index') }}#sobre" class="text-sm font-medium text-gray-300 hover:text-gold-400 transition-colors">A Barbearia</a>
+                    <a href="{{ url_for('index') }}#contato" class="text-sm font-medium text-gray-300 hover:text-gold-400 transition-colors">Localização</a>
+                </nav>
+
+                <!-- Actions / Admin Access -->
+                <div class="flex items-center gap-4">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('admin_dashboard') }}" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-dark-800 text-gold-400 border border-gold-400/30 hover:bg-dark-700 transition">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Painel Dono</span>
+                        </a>
+                        <a href="{{ url_for('logout') }}" title="Sair" class="text-gray-400 hover:text-rose-400 text-sm p-2">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="text-xs font-medium text-gray-400 hover:text-white transition flex items-center gap-1.5 py-2 px-2.5 rounded-lg hover:bg-dark-800">
+                            <i class="fas fa-lock text-gold-400/80"></i>
+                            <span class="hidden sm:inline">Área do Dono</span>
+                        </a>
+                    {% endif %}
+
+                    <!-- Botão Agendar -->
+                    <a href="{{ url_for('agendar') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs tracking-wider uppercase bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 text-dark-950 shadow-lg shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
+                        <i class="fas fa-calendar-check text-sm"></i>
+                        <span>Agendar Agora</span>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- FLASH MESSAGES -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% set cat_classes = {
+                        'success': 'bg-emerald-950/80 border-emerald-500/50 text-emerald-200',
+                        'danger': 'bg-rose-950/80 border-rose-500/50 text-rose-200',
+                        'warning': 'bg-amber-950/80 border-amber-500/50 text-amber-200',
+                        'info': 'bg-blue-950/80 border-blue-500/50 text-blue-200'
+                    } %}
+                    <div class="flex items-center justify-between p-4 mb-4 rounded-xl border backdrop-blur-md {{ cat_classes.get(category, 'bg-dark-800 border-dark-700 text-gray-200') }} shadow-lg transition-all animate-fade-in" role="alert">
+                        <div class="flex items-center gap-3">
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle text-emerald-400 text-lg"></i>
+                            {% elif category == 'danger' %}
+                                <i class="fas fa-exclamation-triangle text-rose-400 text-lg"></i>
+                            {% elif category == 'warning' %}
+                                <i class="fas fa-bell text-amber-400 text-lg"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle text-blue-400 text-lg"></i>
+                            {% endif %}
+                            <span class="text-sm font-medium">{{ message }}</span>
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-white p-1 rounded-lg">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER ELEGANTE -->
+    <footer class="bg-dark-900 border-t border-dark-800 mt-20 pt-16 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+                
+                <!-- Coluna 1: Sobre & Logo -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gold-400 flex items-center justify-center text-dark-950">
+                            <i class="fas fa-scissors"></i>
+                        </div>
+                        <span class="font-serif tracking-wider font-bold text-xl text-white">
+                            BARBER<span class="text-gold-400">SHOP</span>
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Redefinindo o conceito de cuidado masculino com serviços de alto padrão, mestres barbeiros e produtos de primeira linha.
+                    </p>
+                    <div class="flex items-center gap-3 pt-2">
+                        <a href="#" class="w-9 h-9 rounded-lg bg-dark-800 border border-dark-700 flex items-center justify-center text-gray-400 hover:text-gold-400 hover:border-gold-400/50 transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-lg bg-dark-800 border border-dark-700 flex items-center justify-center text-gray-400 hover:text-gold-400 hover:border-gold-400/50 transition">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-lg bg-dark-800 border border-dark-700 flex items-center justify-center text-gray-400 hover:text-gold-400 hover:border-gold-400/50 transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Coluna 2: Links Rápidos -->
+                <div>
+                    <h3 class="font-serif text-white font-bold tracking-wider text-sm mb-4 uppercase">Navegação</h3>
+                    <ul class="space-y-2.5 text-sm text-gray-400">
+                        <li><a href="{{ url_for('index') }}" class="hover:text-gold-400 transition">Início</a></li>
+                        <li><a href="{{ url_for('index') }}#servicos" class="hover:text-gold-400 transition">Tabela de Preços</a></li>
+                        <li><a href="{{ url_for('agendar') }}" class="hover:text-gold-400 transition">Agendar Horário Online</a></li>
+                        <li><a href="{{ url_for('index') }}#galeria" class="hover:text-gold-400 transition">Galeria de Cortes</a></li>
+                        <li><a href="{{ url_for('login') }}" class="hover:text-gold-400 transition">Login do Dono</a></li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 3: Horários -->
+                <div>
+                    <h3 class="font-serif text-white font-bold tracking-wider text-sm mb-4 uppercase">Funcionamento</h3>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex justify-between py-1 border-b border-dark-800">
+                            <span>Terça a Sexta:</span>
+                            <span class="text-white font-medium">09h às 20h</span>
+                        </li>
+                        <li class="flex justify-between py-1 border-b border-dark-800">
+                            <span>Sábado:</span>
+                            <span class="text-white font-medium">08h às 20h</span>
+                        </li>
+                        <li class="flex justify-between py-1 text-gold-400/80">
+                            <span>Domingo e Segunda:</span>
+                            <span class="font-medium">Fechado</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 4: Contato -->
+                <div>
+                    <h3 class="font-serif text-white font-bold tracking-wider text-sm mb-4 uppercase">Onde Estamos</h3>
+                    <p class="text-sm text-gray-400 mb-3 flex items-start gap-2.5">
+                        <i class="fas fa-map-marker-alt text-gold-400 mt-1"></i>
+                        <span>{{ barbershop_address }}</span>
+                    </p>
+                    <p class="text-sm text-gray-400 mb-3 flex items-center gap-2.5">
+                        <i class="fas fa-phone-alt text-gold-400"></i>
+                        <span>{{ barbershop_phone }}</span>
+                    </p>
+                    <a href="{{ url_for('agendar') }}" class="mt-4 block text-center w-full py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-dark-800 text-gold-400 border border-gold-400/30 hover:bg-gold-400 hover:text-dark-950 transition-all duration-200">
+                        Reservar Cadeira
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Bottom Copyright -->
+            <div class="pt-8 border-t border-dark-800 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400 gap-4">
+                <p>&copy; {{ now.year }} {{ barbershop_name }}. Todos os direitos reservados.</p>
+                <div class="flex items-center gap-6">
+                    <span class="flex items-center gap-1.5 text-gray-400">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Sistema Online & Sincronizado
+                    </span>
+                    <a href="{{ url_for('login') }}" class="text-gray-400 hover:text-gold-400 transition">
+                        Acesso Dono
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
